@@ -40,6 +40,7 @@ class App extends React.Component {
         //el charcode me da el Keycode segun el ID de la tecla
         const event2 = {keyCode: event.target.id[1].charCodeAt(),
                        key: event.target.id[1]}
+
         if(event2.key=="X"){
             event2.key="*"
             event2.keyCode=43
@@ -70,7 +71,7 @@ class App extends React.Component {
         //if number
         //estos son los rangos de keycode numericos, no puedo no repetir, no funciona
         if((96<=event.keyCode && event.keyCode<=105) || 
-           (42<=event.keyCode && event.keyCode<= 57) || event.keyCode==110){
+           (48<=event.keyCode && event.keyCode<= 57) || event.keyCode==110){
             
             //si se hace un enter y luego numero, resetea la cuenta
             if(this.checkReboot()){
@@ -85,7 +86,6 @@ class App extends React.Component {
 
             let num1 = numero1
             //prevents double decimal point
-            console.log(event.keyCode)
             if((event.keyCode==110 || event.keyCode==46) && numero1.split("").includes(".")){
                 num1 = num1
             }else{
@@ -112,13 +112,16 @@ class App extends React.Component {
 
         //if operator
         if(oper.includes(event.keyCode)){
+
             //to negate numbers
             if(event.keyCode==109 && operador!="" && numero2==""){
+
                 if(!operador.includes(" -")){
 
                     operador += " -" 
                 }
             }else{
+
                 operador = event.key
 
             }
@@ -183,7 +186,7 @@ class App extends React.Component {
     orangize(event){
 
         let letra = event.key
-        if(letra=="Enter"){
+        if(letra=="enter"||letra=="Enter"){
             letra = "="
         }
 
