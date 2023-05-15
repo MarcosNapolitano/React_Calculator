@@ -53,7 +53,6 @@ class App extends React.Component {
         //esto hace q el foco de enter vaya al igual, sino se quedaria en el elemento clickeado
         document.getElementById("N=").focus()
 
-        console.log(event2.keyCode)
         this.handlePress(event2)
     }
 
