@@ -1,2 +1,0 @@
-le falta que no sume los - infinitamente
-dar estilo en general y testear bugs
