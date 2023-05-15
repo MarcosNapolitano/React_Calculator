@@ -44,6 +44,11 @@ class App extends React.Component {
             event2.key="*"
             event2.keyCode=43
         }
+
+        if(event2.key=="="){
+            event2.key="enter"
+            event2.keyCode=13
+        }
         //esto hace q el foco de enter vaya al igual, sino se quedaria en el elemento clickeado
         document.getElementById("N=").focus()
 
