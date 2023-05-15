@@ -53,13 +53,14 @@ class App extends React.Component {
         //esto hace q el foco de enter vaya al igual, sino se quedaria en el elemento clickeado
         document.getElementById("N=").focus()
 
+        console.log(event2.keyCode)
         this.handlePress(event2)
     }
 
     handlePress(event){
 
         
-        const oper = [111,106,107,109,42,43,47]
+        const oper = [111,106,107,109,42,43,47,45]
         let numero1 = this.state.number1
         let numero2 = this.state.number2
         let operador = this.state.operator
@@ -114,7 +115,7 @@ class App extends React.Component {
         if(oper.includes(event.keyCode)){
 
             //to negate numbers
-            if(event.keyCode==109 && operador!="" && numero2==""){
+            if((event.keyCode==109 || event.keyCode==45) && operador!="" && numero2==""){
 
                 if(!operador.includes(" -")){
 
