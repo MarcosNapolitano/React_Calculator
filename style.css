@@ -138,11 +138,7 @@ button:focus-visible {
   background-color:orange;
   outline:none;
   box-shadow: none;
-  height: 80px;
-  width: 100px;
-  font-weight:800;
-  
-    
+
 }
 
 .drum-pad:focus{
