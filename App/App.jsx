@@ -69,9 +69,9 @@ class App extends React.Component {
             return undefined
         }
         //if number
-        //estos son los rangos de keycode numericos, no puedo no repetir, no funciona
-        if((96<=event.keyCode && event.keyCode<=105) || 
-           (48<=event.keyCode && event.keyCode<= 57) || event.keyCode==110){
+        if((96<=event.keyCode && event.keyCode<=105) || //numbers pressed
+           (48<=event.keyCode && event.keyCode<= 57) || //numbers clicked
+           (event.keyCode==46 || event.keyCode==110)){ //dots!
             
             //si se hace un enter y luego numero, resetea la cuenta
             if(this.checkReboot()){
