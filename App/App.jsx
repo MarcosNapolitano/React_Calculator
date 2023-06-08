@@ -11,7 +11,7 @@ class App extends React.Component {
         number2:"",
         result: "0",
         display:" ",
-        operator: "",
+        operator: false,
         reboot: false
 
         };
@@ -24,14 +24,12 @@ class App extends React.Component {
 
     componentDidMount() {
         document.addEventListener("keydown", this.handlePress);
+        
+        
     }
 
     componentWillUnmount() {
         document.removeEventListener("keydown", this.handlePress);
-    }
-
-    checkReboot(){
-        return this.state.reboot
     }
 
     handleClick(event){
@@ -50,135 +48,204 @@ class App extends React.Component {
             event2.key="enter"
             event2.keyCode=13
         }
-        //esto hace q el foco de enter vaya al igual, sino se quedaria en el elemento clickeado
+        //keeps focus in "=" button
         document.getElementById("N=").focus()
 
         this.handlePress(event2)
     }
 
     handlePress(event){
-
+        
         
         const oper = [111,106,107,109,42,43,47,45]
         let numero1 = this.state.number1
         let numero2 = this.state.number2
         let operador = this.state.operator
 
-        if(numero1.length>15||numero2.length>15){
+        if(numero1.length>15 || numero2.length>15){
+            
             this.setState({result:"Max Digits Reached"})
             return undefined
         }
-        //if number
+
+
+        //if number, decimal point or delete
         if((96<=event.keyCode && event.keyCode<=105) || //numbers pressed
            (48<=event.keyCode && event.keyCode<= 57) || //numbers clicked
-           (event.keyCode==46 || event.keyCode==110)){ //dots!
+           (event.keyCode==46 || event.keyCode==110) || //dots!
+           (event.keyCode==8)){                         //delete
             
-            //si se hace un enter y luego numero, resetea la cuenta
-            if(this.checkReboot()){
+            //a number after an enter will reset the operation
+            if(this.state.reboot){
+                console.log(this.state.reboot)
+                //I just want to reset from a number
+                if(event.keyCode==8){
+                    return this.reset()
+                }
 
-                numero1  = ""
-                numero2  = ""
-                operador = ""
-                this.setState({number1: "", operator:"", number2:"", 
-                               result:"0",display:"", reboot: false})
+                return this.setState({number1: event.key, operator: false, number2:"", 
+                               result:event.key,display:event.key, reboot: false})
 
             }
 
-            let num1 = numero1
-            //prevents double decimal point
-            if((event.keyCode==110 || event.keyCode==46) && numero1.split("").includes(".")){
-                num1 = num1
-            }else{
-                num1 += event.key
-            }
+            //swtiches between num1 and num2
+            if(operador){
 
-            //separa en numero 1 y 2 por antes o despues del operador
-            if(operador==""){
-                this.setState({display: num1, result:num1, number1:num1});
+                //if delete
+                if(event.keyCode==8){
 
-            }else{
-                let num2 = numero2
-                if((event.keyCode==110 || event.keyCode==46) && numero2.split("").includes(".")){
-                    num2 = num2
-                }else{
-                    num2 += event.key
+                    if(numero2.length<=1){
+                        numero2 = "0"
+                    }else{
+                        numero2 = numero2.slice(0, numero2.length-1)
+                    }
+                
+                    this.setState({result: numero2, number2: numero2 })
+                    return numero2
+                }
+
+                //prevents double decimal point
+                if(!numero2.split("").includes(".")){
+
+                    numero2 += event.key
                     this.setState({display: numero1 + operador, 
-                                result: num2, number2: num2 })
+                        result: numero2, number2: numero2 })
+                    return numero2
+                        
+                        //add only if it's not a dot!
+                }else if(!(event.keyCode==110 || event.keyCode==46)){
+
+                    numero2 += event.key
+                    this.setState({display: numero1 + operador, 
+                        result: numero2, number2: numero2 })
+                    return numero2
+                }
+
+            }else{
+
+                //if delete
+                if(event.keyCode==8){
+
+                    if(numero1.length<=1){
+                        numero1 = ""
+                        this.setState({display: " ", result: "0", number1: numero1 })
+                        
+                    }else{
+                        numero1 = numero1.slice(0, numero1.length-1)
+                        this.setState({display: numero1, result: numero1, number1: numero1 })
+
+                    }
+                
+                    return numero1
+                }
+
+                //prevents double decimal point
+                if(!numero1.split("").includes(".")){
+
+                    numero1 += event.key
+                    this.setState({number1: numero1, display: numero1, result: numero1})
+                    return numero1
+                        
+                        //add only if it's not a dot!
+                }else if(!(event.keyCode==110 || event.keyCode==46)){
+
+                    numero1 += event.key
+                    this.setState({number1: numero1, display: numero1, result: numero1})
+                    return numero1
                 }
             }
+            
             this.orangize(event)
 
         }
 
+
         //if operator
         if(oper.includes(event.keyCode)){
 
-            //to negate numbers
-            if((event.keyCode==109 || event.keyCode==45) && operador!="" && numero2==""){
-
-                if(!operador.includes(" -")){
-
-                    operador += " -" 
-                }
-            }else{
-
-                operador = event.key
-
+            //negate numbers
+            if(numero1=="" && (event.keyCode==109 || event.keyCode==45)){
+                this.orangize(event)
+                return this.setState({number1:"-", result:"-"})
             }
+
+            if(numero2=="" && operador && (event.keyCode==109 || event.keyCode==45)){
+                this.orangize(event)
+                return this.setState({number2:"-", result:"-", display:numero1 + operador})
+            }
+
+            operador = event.key
+
             this.setState({operator:operador, result:operador})
 
             //operate on the result
-            if(this.checkReboot()){
+            if(this.state.reboot){
                 numero2 = ""
-                this.setState({display: numero1, reboot:false, number2:""})
+                this.setState({display: numero1 + operador, reboot:false, number2:"", result:numero1})
             }
-            //keep operating result if operator is pushed several times
+
+            //keeps operating the result if operator is pushed several times
             if(numero2!=""){
-                //si no lo hago como string, despues tira error cuando chequea
-                //por doble decimal
+
+                //has to be a string in order to check for double decimal point
                 const result = eval(numero1 + operador + numero2).toString()
+
+                if (result.length>19){
+                    this.setState({result:"Max Digits Reached"})
+                    return undefined
+                } 
                 
-                this.setState({display: result, number1:result, number2:""})
-            }
+                this.setState({display: result + operador, number1:result, number2:"", result:result})
+            }   
+
             this.orangize(event)
 
         }
         
         //if enter
-        if(event.keyCode==13){
-            this.calculate(numero1, operador, numero2)
-            this.orangize(event)
+        if(event.keyCode==13 && numero1!="" && operador){
+            this.calculate()
         }
 
     }
 
-    calculate(num1, oper, num2){
+    calculate(){
 
-        const result = eval(num1 + oper + num2).toString()
+        const num1 = this.state.number1
+        const num2 = this.state.number2
+        const oper = this.state.operator
 
-        //para q la proxima q ingreses un numero resetee, si viene de un enter
-    
-        if(!this.checkReboot()){
+        const result = eval(`${num1} ${oper} ${num2}`).toString()
+
+        if (result.length>19){
+            this.setState({result:"Max Digits Reached"})
+            return undefined
+        } 
+
+        //next time you hit a number after an enter it will reset the oper
+        if(!this.state.reboot){
             this.setState({reboot:true})
         }
         
         this.setState({number1:result, result: result,
-                       display:num1 + oper + num2+" ="});
+                       display: `${num1}${oper}${num2} =`});
         
     }
 
-    reset(){
+    //reset is also called from backspace press but without an event
+    reset(e=false){
+
+        if(e) e.target.blur()//prevents focus on AC
+
         this.setState({number1:"",
                        number2:"",
                        result: "0",
                        display:" ",
-                       operator: "",
+                       operator: false,
                        reboot: false})
 
-        //sino el foco se queda en el AC
-        document.getElementById("N=").focus()
-        return undefined
 
+        return undefined
        
     }
     
@@ -186,6 +253,7 @@ class App extends React.Component {
     orangize(event){
 
         let letra = event.key
+
         if(letra=="enter"||letra=="Enter"){
             letra = "="
         }
@@ -193,7 +261,9 @@ class App extends React.Component {
         if(letra=="*"){
             letra = "X"
         }
-        var a = document.getElementById("N"+letra)
+
+        let a = document.getElementById("N"+letra)
+
         a.className = "drum-pad_active"
         setTimeout(()=>{a.className = ""},100)
     

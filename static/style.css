@@ -61,7 +61,7 @@ button:hover {
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: none;
 }
 
 
@@ -99,8 +99,10 @@ button:focus-visible {
   margin:0;
 }
 
+
 #display{
-  color:rgb(143, 143, 143)
+  color:rgb(143, 143, 143);
+  font-size: 2vh
 }
 
 
